@@ -1,0 +1,22 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Test and coverage output
+*.out
+coverage.txt
+
+# Go workspace files
+go.work
+
+# Built CLI binaries
+/bin/
+
+# Machine-specific file paths and hashes embedded into the scanner
+/internal/baseline/baseline.json

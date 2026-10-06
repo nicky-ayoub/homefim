@@ -9,9 +9,11 @@ and checking a SHA-256 file-integrity baseline:
 - `secure_fim` checks the paths and hashes in the embedded baseline. It reports
   missing files, hash mismatches, and file read errors.
 
-The baseline contains file paths and hashes, not file contents. Review the
-generated `internal/baseline/baseline.json` before building or distributing the
-scanner.
+The baseline contains machine-specific file paths and hashes, not file
+contents. It may reveal information about the local account and files, so
+`internal/baseline/baseline.json` is ignored by Git and should not be published.
+The scanner embeds the baseline at build time, so its binary also contains that
+machine-specific data.
 
 ## Requirements
 
@@ -26,8 +28,9 @@ Generate a baseline for the current user:
 go run ./cmd/generate-baseline
 ```
 
-This writes `internal/baseline/baseline.json`. The scanner embeds that file at
-build time, so regenerate the scanner binary after changing the baseline.
+This writes the Git-ignored `internal/baseline/baseline.json`. Generate it on
+the machine you want to monitor before building the scanner. Regenerate the
+scanner binary after changing the baseline.
 
 ## Build
 
