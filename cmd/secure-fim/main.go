@@ -27,17 +27,17 @@ func main() {
 	}
 
 	log.Printf("[+] FIM engine initialized. Loaded %d audit targets from embedded baseline.", len(currentBaseline))
-	verifyIntegrity(currentBaseline)
+	error_count := verifyIntegrity(currentBaseline)
 
 	if !*loop {
-		return
+		os.Exit(error_count)
 	}
 
 	log.Printf("[+] NIS compatibility mode active (Polling every %v)...", scanInterval)
 	ticker := time.NewTicker(scanInterval)
 	defer ticker.Stop()
 	for range ticker.C {
-		verifyIntegrity(currentBaseline)
+		error_count += verifyIntegrity(currentBaseline)
 	}
 }
 
@@ -55,17 +55,20 @@ func calculateHash(filePath string) (string, error) {
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
 }
 
-func verifyIntegrity(currentBaseline Baseline) {
+func verifyIntegrity(currentBaseline Baseline) int {
+	error_count := 0
 	for target, baselineHash := range currentBaseline {
 		_, err := os.Stat(target)
 		if os.IsNotExist(err) {
 			log.Printf("[🚨 CRITICAL] %s has been REMOVED from the NIS share!", target)
+			error_count++
 			continue
 		}
 
 		newHash, err := calculateHash(target)
 		if err != nil {
 			log.Printf("[-] Error reading target %s over network: %v", target, err)
+			error_count++
 			continue
 		}
 
@@ -75,4 +78,5 @@ func verifyIntegrity(currentBaseline Baseline) {
 			log.Printf("    -> Observed: %s", newHash)
 		}
 	}
+	return error_count
 }

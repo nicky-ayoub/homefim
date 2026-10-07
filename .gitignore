@@ -20,3 +20,5 @@ go.work
 
 # Machine-specific file paths and hashes embedded into the scanner
 /internal/baseline/baseline.json
+
+*.code-workspace
